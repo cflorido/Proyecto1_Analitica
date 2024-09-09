@@ -3,7 +3,7 @@ from dash import dcc  # dash core components
 from dash import html # dash html components 
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
-
+import plotly.express as px
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -22,7 +22,19 @@ app.layout = html.Div(
                 )
             ]
         ),
-        html.H6("Modifique el valor de los factores para determinar la rentabilidad máxima", style={'marginTop': '40px'}),  # Añade espacio entre el título y el contenido
+        
+        html.H6("Introduzca los valores promedios para cada factor para determinar la rentabilidad máxima",style={
+        'backgroundColor': '#f8d7da',  # Fondo de color rojo pastel suave
+        'border': '2px solid #f5c6cb',  # Borde de color rojo más oscuro
+        'borderRadius': '10px',  # Bordes redondeados
+        'padding': '15px',  # Espaciado interno
+        'marginTop': '40px',  # Margen superior
+        'boxShadow': '2px 2px 5px rgba(0,0,0,0.1)',  # Sombra de caja
+        'color': '#721c24',  # Texto de color rojo oscuro
+        'fontWeight': 'bold',  # Texto en negrita
+        'fontFamily': 'Arial, sans-serif',  # Fuente
+        'textAlign': 'center',  # Centrar el texto
+    }),  # Añade espacio entre el título y el contenido
 
         # Caja de texto para la hora del día
         html.Div(["Ingrese la hora del día: ",
@@ -155,6 +167,7 @@ app.layout = html.Div(
         html.H5("Resultados de Rentabilidad"),
         dcc.Graph(id='sensitivity_graph'),  # Componente de gráfica para análisis de sensibilidad
         dcc.Graph(id='sensitivity_graph2'),
+        dcc.Graph(id='bicycle_time_graph'),
         html.Div(id='productivity_summary')  
     ]
 )
@@ -169,12 +182,13 @@ box_style = {
     'fontFamily': 'Arial, sans-serif',  # Fuente
     'color': '#333333',  # Color del texto
 }
-# Callback para actualizar el resultado basado en las entradas
+
 @app.callback(
     [
         Output('sensitivity_graph', 'figure'),
         Output('sensitivity_graph2', 'figure'),
-        Output('productivity_summary', 'children')
+        Output('productivity_summary', 'children'),
+        Output('bicycle_time_graph', 'figure')
     ],
     [
         Input('hour', 'value'),
@@ -246,7 +260,7 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowf
     figure_sensitivity2 = {
         'data': [
             {'x': precios_range2, 'y': rentabilidad_sensibilidad2, 'type': 'bar', 'name': 'Rentabilidad (WON)', 
-            'marker': {'color': 'rgba(255, 153, 51, 0.7)', 'line': {'color': 'rgba(255, 153, 51, 1)', 'width': 2}}},
+            'marker': {'color': 'rgba(186, 85, 211, 0.7)', 'line': {'color': 'rgba(148, 0, 211, 1)', 'width': 2}}},
         ],
         'layout': {
             'title': 'Análisis de Sensibilidad - Precio vs Rentabilidad (WON)',
@@ -256,7 +270,47 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowf
             'paper_bgcolor': 'rgba(255, 255, 255, 1)',  # Fondo del papel
         }
     }
+    # Nueva gráfica para cantidad de bicicletas según el rango de horas
+    hours_range = list(range(0, hour + 1))
+    bici_per_hour = [round(642.850656
+                           + h * 27.804568
+                           + temperature * 27.191647
+                           + humidity * -8.631740
+                           + windSpeed * 16.505881
+                           + solar * -87.836559
+                           + rainfall * -68.643147
+                           + snowfall * 36.696809
+                           + season_effect
+                           + holiday_effect) for h in hours_range]
 
+    bicycle_time_graph = {
+        'data': [
+            {
+                'x': bici_per_hour,  # La cantidad de bicicletas ahora va en el eje X
+                'y': hours_range,  # Las horas ahora van en el eje Y
+                'type': 'bar',
+                'orientation': 'h',  # Esto hace que las barras sean horizontales
+                'marker': {
+                    'color': 'rgba(255, 182, 193, 0.7)',  # Color pastel azul claro
+                    'line': {'color': 'rgba(255, 105, 180, 1)', 'width': 2}  # Color del borde azul más fuerte
+                }
+            }
+        ],
+        'layout': {
+            'title': 'Cantidad de Bicicletas vs Hora',
+            'xaxis': {'title': 'Cantidad de Bicicletas'},
+            'yaxis': {'title': 'Hora del Día', 'tickangle': 0},  # Mantén las etiquetas de las horas sin rotación
+            'plot_bgcolor': 'rgba(245, 245, 245, 1)',  # Fondo de la gráfica en gris claro
+            'paper_bgcolor': 'rgba(255, 255, 255, 1)',  # Fondo del papel en blanco
+            'bargap': 0.15,  # Espacio entre barras
+            'barmode': 'group',  # Modo de agrupación para las barras
+            'font': {
+                'family': 'Arial, sans-serif',
+                'color': '#333333'  # Color de fuente en gris oscuro
+            }
+        }
+    }
+    
     # Texto de resumen con predicciones
     summary = html.Div([
         html.H4("Resumen del Análisis"),
@@ -264,7 +318,7 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowf
         html.P(f"Rentabilidad en COP: {rentabilidad_pesos:.2f}"),
         html.P(f"Rentabilidad en KRW: {rentabilidad_won:.2f}")
     ], style=box_style)
-    return figure_sensitivity, figure_sensitivity2,summary
+    return figure_sensitivity, figure_sensitivity2,summary, bicycle_time_graph
 
 if __name__ == '__main__':
     app.run_server(debug=True)
