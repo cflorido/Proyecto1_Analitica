@@ -51,11 +51,6 @@ app.layout = html.Div(
             marks={i: f'{i}°C' for i in range(-20, 41, 10)},
         ),
         html.Br(),
-        # Caja de texto para humedad
-        html.Div(["Ingrese el porcentaje de humedad: ",
-                  dcc.Input(id='humidity', value=0.5, type='number', min=0, max=1)]),
-        html.Br(),
-
         html.Div(
             style={'display': 'flex', 'justifyContent': 'center'},
             children=[
@@ -72,7 +67,14 @@ app.layout = html.Div(
                         dcc.Input(id='solar', value=4, type='number', min=0, step=0.1)
                     ],
                     style={'padding': '10px'}
-                )
+                ),
+                html.Div(
+                    [
+                        html.Label("Ingrese el porcentaje de humedad"),
+                        dcc.Input(id='humidity', value=0.5, type='number', min=0, max=1)
+                    ],
+                    style={'padding': '10px'}
+                ),
             ]
         ),
         # Slider para el nivel de lluvia
