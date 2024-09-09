@@ -62,14 +62,14 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Label("Ingrese la velocidad del viento (m/s):"),
-                        dcc.Input(id='windSpeed', value=3, type='number', min=0, step=1)
+                        dcc.Input(id='windSpeed', value=3, type='number', min=0, step=0.1)
                     ],
                     style={'padding': '10px'}
                 ),
                 html.Div(
                     [
                         html.Label("Ingrese el nivel de Radiación Solar (MJ/m2)"),
-                        dcc.Input(id='solar', value=4, type='number', min=0, step=1)
+                        dcc.Input(id='solar', value=4, type='number', min=0, step=0.1)
                     ],
                     style={'padding': '10px'}
                 )
