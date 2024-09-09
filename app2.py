@@ -199,39 +199,42 @@ box_style = {
 )
 def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, season, holiday,pesos, won,cpesos, cwon):
     # Inicializa la variable 'season_effect' según la estación seleccionada
+    
+    #Definir lambda
+    lamBox = 0.2730547113417922
     season_effect = 0
     if season == 'spring':
-        season_effect = -1.693754
+        season_effect = -1.687640
     elif season == 'summer':
-        season_effect = -1.482233
+        season_effect = -1.488615
     elif season == 'winter':
-        season_effect = -4.054007
+        season_effect = -4.054296
     # Otoño ya es el valor por defecto con coeficiente 0 (sin ajuste)
 
     # Ajusta el valor del festivo
-    holiday_effect = 1.586679 if holiday == 'yes' else 0
+    holiday_effect = 1.585232 if holiday == 'yes' else 0
     
     # Definir coeficientes por hora
     hour_effects = {
-        1: -1.003318, 2: -2.516777, 3: -4.134645, 4: -5.398932, 5: -5.272784,
-        6: -2.469054, 7: 0.841956, 8: 3.555189, 9: 0.613454, 10: -1.635420,
-        11: -1.368497, 12: -1.118949, 13: -1.261520, 14: -1.372315, 15: -0.686067,
-        17: 1.709972, 18: 4.377564, 19: 2.906739, 20: 2.617423, 21: 2.780623,
-        22: 2.195108, 23: 0.747327}
+        1: -1.022797, 2: -2.538409, 3: -4.148855, 4: -5.410030,
+        5: -5.296757, 6: -2.483916, 7: 0.828508, 8: 3.554421,
+        9: 0.628419, 10: -1.619980, 11: -1.346580, 12: -1.081500,
+        13: -1.224894, 14: -1.344771, 15: -0.655167, 17: 1.726126,
+        18: 4.402927, 19: 2.902046, 20: 2.622502, 21: 2.697714, 22: 2.181438}
     
     # Calcular el efecto de la hora seleccionada
     hour_effect = hour_effects.get(hour, 0)  # Valor por defecto es 0 si no se encuentra
 
     # Calcular la cantidad de bicicletas con los nuevos coeficientes
-    bici = round((18.906423
+    bici = round(((18.863284
                  + hour_effect
-                 + temperature * 0.210013
-                 + humidity * -0.073232
-                 + windSpeed * -0.141674
-                 + solar * 0.411949
-                 + rainfall * -1.061888
+                 + temperature * 0.210172
+                 + humidity * -0.072198
+                 + windSpeed * -0.140848
+                 + solar * 0.397738
+                 + rainfall * -1.161975
                  + season_effect
-                 + holiday_effect)**2)
+                 + holiday_effect)*lamBox + 1)**(1/lamBox)-1)
     
     # Cálculo de rentabilidad
     rentabilidad_pesos = (bici * pesos)-(cpesos*bici)
@@ -275,15 +278,15 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, seaso
     hours_range = list(range(1, hour + 1))
     # Cálculo de bicicletas por hora utilizando los coeficientes categóricos
     bici_per_hour = [
-        round((18.906423
+        round(((18.863284
             + hour_effects.get(h, 0)  # Aplicar el coeficiente de la hora categórica
-            + temperature * 0.210013
-            + humidity * -0.073232
-            + windSpeed * -0.141674
-            + solar * 0.411949
-            + rainfall * -1.061888
+            + temperature * 0.210172
+            + humidity * -0.072198
+            + windSpeed * -0.140848
+            + solar * 0.397738
+            + rainfall * -1.161975
             + season_effect
-            + holiday_effect)**2)
+            + holiday_effect)*lamBox + 1)**(1/lamBox)-1)
         for h in hours_range
     ]
 
