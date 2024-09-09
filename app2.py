@@ -317,11 +317,11 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, seaso
             }
         }
     }
-
+    total_bici_range = sum(bici_per_hour)
     # Texto de resumen con predicciones
     summary = html.Div([
         html.H4("Resumen del Análisis"),
-        html.P(f"Predicción de bicicletas: {bici:.2f} unidades"),
+        html.P(f"Suma del rango de bicicletas: {total_bici_range:.2f} unidades"),
         html.P(f"Rentabilidad en COP: {rentabilidad_pesos:.2f}"),
         html.P(f"Rentabilidad en KRW: {rentabilidad_won:.2f}")
     ], style=box_style)
