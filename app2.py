@@ -186,8 +186,7 @@ box_style = {
         Input('humidity', 'value'),
         Input('windSpeed', 'value'),
         Input('solar', 'value'),        
-        Input('rainfall', 'value'),
-        Input('snowfall', 'value'),               
+        Input('rainfall', 'value'),               
         Input('season', 'value'),
         Input('holiday', 'value'),
         Input('pesos', 'value'),
@@ -196,7 +195,7 @@ box_style = {
         Input('cwon', 'value')
     ]
 )
-def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowfall, season, holiday,pesos, won,cpesos, cwon):
+def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, season, holiday,pesos, won,cpesos, cwon):
     # Inicializa la variable 'season_effect' según la estación seleccionada
     season_effect = 0
     if season == 'spring':
@@ -210,17 +209,17 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowf
     # Ajusta el valor del festivo
     holiday_effect = 1.586679 if holiday == 'yes' else 0
     
-    # Calcular el efecto de la hora seleccionada
-    hour_effect = hour_effects.get(hour, 0)  # Valor por defecto es 0 si no se encuentra
-
     # Definir coeficientes por hora
     hour_effects = {
         1: -1.003318, 2: -2.516777, 3: -4.134645, 4: -5.398932, 5: -5.272784,
         6: -2.469054, 7: 0.841956, 8: 3.555189, 9: 0.613454, 10: -1.635420,
         11: -1.368497, 12: -1.118949, 13: -1.261520, 14: -1.372315, 15: -0.686067,
         17: 1.709972, 18: 4.377564, 19: 2.906739, 20: 2.617423, 21: 2.780623,
-        22: 2.195108, 23: 0.747327
-    }
+        22: 2.195108, 23: 0.747327}
+    
+    # Calcular el efecto de la hora seleccionada
+    hour_effect = hour_effects.get(hour, 0)  # Valor por defecto es 0 si no se encuentra
+
     # Calcular la cantidad de bicicletas con los nuevos coeficientes
     bici = round((18.906423
                  + hour_effect
@@ -281,7 +280,6 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowf
             + windSpeed * -0.141674
             + solar * 0.411949
             + rainfall * -1.061888
-            + snowfall * 36.696809
             + season_effect
             + holiday_effect)
         for h in hours_range
