@@ -273,7 +273,7 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, seaso
     hours_range = list(range(1, hour + 1))
     # Cálculo de bicicletas por hora utilizando los coeficientes categóricos
     bici_per_hour = [
-        round(18.906423
+        round((18.906423
             + hour_effects.get(h, 0)  # Aplicar el coeficiente de la hora categórica
             + temperature * 0.210013
             + humidity * -0.073232
@@ -281,7 +281,7 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, seaso
             + solar * 0.411949
             + rainfall * -1.061888
             + season_effect
-            + holiday_effect)
+            + holiday_effect)**2)
         for h in hours_range
     ]
 
