@@ -174,7 +174,17 @@ box_style = {
     'fontFamily': 'Arial, sans-serif',  # Fuente
     'color': '#333333',  # Color del texto
 }
-
+box_style2 = {
+    'backgroundColor': '#fff8e1',  # Fondo de la caja (un amarillo claro para advertencia)
+    'border': '2px solid #ffa726',  # Borde naranja
+    'borderRadius': '10px',  # Bordes redondeados
+    'padding': '15px',  # Espaciado interno
+    'margin': '10px 0',  # Margen externo
+    'boxShadow': '2px 2px 5px rgba(0,0,0,0.1)',  # Sombra de caja
+    'textAlign': 'center',  # Centrar el texto
+    'fontFamily': 'Arial, sans-serif',  # Fuente
+    'color': '#d32f2f',  # Color del texto en rojo oscuro para advertencia
+}
 @app.callback(
     [
         Output('sensitivity_graph', 'figure'),
@@ -318,13 +328,20 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, seaso
         }
     }
     total_bici_range = sum(bici_per_hour)
-    # Texto de resumen con predicciones
     summary = html.Div([
         html.H4("Resumen del Análisis"),
         html.P(f"Suma del rango de bicicletas: {total_bici_range:.2f} unidades"),
         html.P(f"Rentabilidad en COP: {rentabilidad_pesos:.2f}"),
-        html.P(f"Rentabilidad en KRW: {rentabilidad_won:.2f}")
+        html.P(f"Rentabilidad en KRW: {rentabilidad_won:.2f}"),
+        
+        # Caja de advertencia
+        html.Div([
+            html.H5("Advertencia del Modelo", style={'color': '#d32f2f'}),
+            html.P("Incumple con el supuesto de Homocedasticidad y Especificación"),
+        ], style=box_style2)
+        
     ], style=box_style)
+
     return figure_sensitivity, figure_sensitivity2,summary, bicycle_time_graph
 
 if __name__ == '__main__':
