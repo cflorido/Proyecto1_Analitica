@@ -85,16 +85,6 @@ app.layout = html.Div(
             value=5,
             marks={i: f'{i} mm' for i in range(0, 36, 5)},
         ),
-        # Slider para el nivel de nieve
-        html.Div("Seleccione el nivel de nieve (cm):"),
-        dcc.Slider(
-            id='snowfall',
-            min=0,
-            max=35,
-            step=1,
-            value=5,
-            marks={i: f'{i} cm' for i in range(0, 36, 5)},
-        ),
         # Dropdown para seleccionar la estación del año
         html.Div("Seleccione la estación del año:"),
         dcc.Dropdown(
@@ -210,27 +200,37 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowf
     # Inicializa la variable 'season_effect' según la estación seleccionada
     season_effect = 0
     if season == 'spring':
-        season_effect = -144.851750
+        season_effect = -1.693754
     elif season == 'summer':
-        season_effect = -158.982762
+        season_effect = -1.482233
     elif season == 'winter':
-        season_effect = -368.205780
+        season_effect = -4.054007
     # Otoño ya es el valor por defecto con coeficiente 0 (sin ajuste)
 
     # Ajusta el valor del festivo
-    holiday_effect = 128.337445 if holiday == 'yes' else 0
+    holiday_effect = 1.586679 if holiday == 'yes' else 0
+    
+    # Calcular el efecto de la hora seleccionada
+    hour_effect = hour_effects.get(hour, 0)  # Valor por defecto es 0 si no se encuentra
 
-    # Regresión para calcular la cantidad de bicicletas según los factores
-    bici = round(642.850656
-            + hour * 27.804568
-            + temperature * 27.191647
-            + humidity * -8.631740
-            + windSpeed * 16.505881
-            + solar * -87.836559
-            + rainfall * -68.643147
-            + snowfall * 36.696809
-            + season_effect
-            + holiday_effect)
+    # Definir coeficientes por hora
+    hour_effects = {
+        1: -1.003318, 2: -2.516777, 3: -4.134645, 4: -5.398932, 5: -5.272784,
+        6: -2.469054, 7: 0.841956, 8: 3.555189, 9: 0.613454, 10: -1.635420,
+        11: -1.368497, 12: -1.118949, 13: -1.261520, 14: -1.372315, 15: -0.686067,
+        17: 1.709972, 18: 4.377564, 19: 2.906739, 20: 2.617423, 21: 2.780623,
+        22: 2.195108, 23: 0.747327
+    }
+    # Calcular la cantidad de bicicletas con los nuevos coeficientes
+    bici = round((18.906423
+                 + hour_effect
+                 + temperature * 0.210013
+                 + humidity * -0.073232
+                 + windSpeed * -0.141674
+                 + solar * 0.411949
+                 + rainfall * -1.061888
+                 + season_effect
+                 + holiday_effect)**2)
     
     # Cálculo de rentabilidad
     rentabilidad_pesos = (bici * pesos)-(cpesos*bici)
@@ -271,23 +271,27 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowf
         }
     }
     # Nueva gráfica para cantidad de bicicletas según el rango de horas
-    hours_range = list(range(0, hour + 1))
-    bici_per_hour = [round(642.850656
-                           + h * 27.804568
-                           + temperature * 27.191647
-                           + humidity * -8.631740
-                           + windSpeed * 16.505881
-                           + solar * -87.836559
-                           + rainfall * -68.643147
-                           + snowfall * 36.696809
-                           + season_effect
-                           + holiday_effect) for h in hours_range]
+    hours_range = list(range(1, hour + 1))
+    # Cálculo de bicicletas por hora utilizando los coeficientes categóricos
+    bici_per_hour = [
+        round(18.906423
+            + hour_effects.get(h, 0)  # Aplicar el coeficiente de la hora categórica
+            + temperature * 0.210013
+            + humidity * -0.073232
+            + windSpeed * -0.141674
+            + solar * 0.411949
+            + rainfall * -1.061888
+            + snowfall * 36.696809
+            + season_effect
+            + holiday_effect)
+        for h in hours_range
+    ]
 
     bicycle_time_graph = {
         'data': [
             {
                 'x': bici_per_hour,  # La cantidad de bicicletas ahora va en el eje X
-                'y': hours_range,  # Las horas ahora van en el eje Y
+                'y': [f'Hora {h}' for h in hours_range],  # Las horas ahora van en el eje Y
                 'type': 'bar',
                 'orientation': 'h',  # Esto hace que las barras sean horizontales
                 'marker': {
@@ -310,7 +314,7 @@ def update_figure(hour, temperature, humidity, windSpeed, solar, rainfall, snowf
             }
         }
     }
-    
+
     # Texto de resumen con predicciones
     summary = html.Div([
         html.H4("Resumen del Análisis"),
